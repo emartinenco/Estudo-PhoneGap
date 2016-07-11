@@ -156,11 +156,16 @@
 		});
 		
 		function initLocalStorage(){
-			if(localStorage.getItem("idItem") == null){
-				localStorage.setItem('idItem', idItem);
-			} else {
-				idItem = parseInt(localStorage.getItem("idItem"));
-			}
+		
+			var listaDados = [{id: 'idItem', valor: idItem}];
+		
+			$.each(listaDados, function (){
+				if(localStorage.getItem(this.id) == null){
+					localStorage.setItem(this.id, this.valor);
+				} else {
+					this.valor = parseInt(localStorage.getItem(this.id));
+				}				
+			});
 			
 			if(localStorage.getItem("tarefas") == null){
 				localStorage.setItem('tarefas', JSON.stringify(tarefas));
@@ -223,14 +228,7 @@
 			confBotoes();
 			
 			if (id == null){
-				myApp.addNotification({
-					title: 'Tarefa adicionada com sucesso!',
-					hold: 6000,
-					button: {
-						text: 'Fechar',
-						color: 'red'
-					}
-				});			
+				addMsgNotification('Tarefa adicionada com sucesso!', 6000);
 			}
 			
 			$('#none-item').hide();
@@ -279,27 +277,47 @@
 			myApp.confirm('Tem certeza que deseja remover essa tarefa?', 'Remover Tarefa', function() {
 				$('#' + idItem).parents('li').remove();
 				checkBoxesChecked();
-				var itemARemover;
-				$.each(tarefas, function() {
-					if (this.id == idItem.substr(idItem.length - 1)) {
-						itemARemover = this;
-					}
-				});
-				indice = tarefas.indexOf(itemARemover);
-				tarefas.splice(indice, 1);
-				updateLocalStorageGlobal();
+				removerItemLocalStorage(idItem);
+				addMsgNotification('Tarefa removida com sucesso!', 6000);
 			});
+		}
+		
+		function removerItemLocalStorage(idItem){
+			var itemARemover;
+			$.each(tarefas, function() {
+				if (this.id == idItem.substr(idItem.length - 1)) {
+					itemARemover = this;
+				}
+			});
+			indice = tarefas.indexOf(itemARemover);
+			tarefas.splice(indice, 1);
+			updateLocalStorageGlobal();
 		}
 		
 		function removerTodosItens() {
 			myApp.confirm('Tem certeza que deseja remover todas as tarefas?', 'Remover Tarefas', function() {
 				var boxes = $('input[name=my-checkbox]:checked');
 				boxes.each(function() {
+					var id = $(this).attr('id');
 					$(this).parents('li').remove();
+					removerItemLocalStorage(id);
+					
 				});
 				checkBoxesChecked();
+				addMsgNotification('Tarefas removidas com sucesso!', 6000);
 			});				
 			
+		}
+		
+		function addMsgNotification(titulo, timeout){
+			myApp.addNotification({
+				title: titulo,
+				hold: timeout,
+				button: {
+					text: 'Fechar',
+					color: 'red'
+				}
+			});
 		}
 		
 		function limparCampos() {
