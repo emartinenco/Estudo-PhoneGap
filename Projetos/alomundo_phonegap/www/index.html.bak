@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<html>
   <head>
     <!-- Required meta tags-->
     <meta charset="utf-8">
@@ -152,8 +153,13 @@
 				maxCount:           60,
 				strictMax:          true,
 				countDirection:     'down'
-			});
-		});
+			});			
+			
+			$('#remove-all').click(function(){ 
+				removerTodosItens();
+			});			
+			
+		});		
 		
 		function initLocalStorage(){
 			if(localStorage.getItem("idItem") == null){
@@ -193,29 +199,26 @@
 			//var descricao = prompt('Digite a tarefa:', '');
 			var texto = $('#new-tarefa').val();
 			var descricao = $('#descricao').val();
-			if (texto != null) {
-				if (texto.trim() == '') {
-					myApp.alert('A tarefa n�o pode estar vazia!', 'Alerta', limparCampos);
+			if (texto != null){
+				if (texto.trim() == ''){
+					myApp.alert('A tarefa não pode estar vazia!', 'Alerta');
 				} else {
 					tarefa = {id: 0, check: false, texto: texto, descricao: descricao};
-					tarefas.push(tarefa);
-					addItemLista(tarefa, null);
-					updateLocalStorageGlobal();
+					tarefas.push(tarefa);								
+					addItemLista(tarefa, null);					
+					localStorage.setItem('tarefas', JSON.stringify(tarefas));	
 				}
 				limparCampos();
 			} 
 		}
-		
-		function updateLocalStorageGlobal() {
-			localStorage.setItem('tarefas', JSON.stringify(tarefas));
-		}
-		
-		function addItemLista(tarefa, id) {
-			if (id == null) {
+			
+		function addItemLista(tarefa, id){
+			if (id == null){
 				idItem += 1;
 				tarefa.id = idItem;
-				localStorage.setItem('idItem', idItem);
 			}
+			
+			localStorage.setItem('idItem', idItem);
 			var clone = $('#item-tarefa li#primeiro').clone().removeAttr('id').appendTo('#item-tarefa ul').show();
 			clone.find('.check-tarefa').attr('id', 'tarefa' + (id != null ? id : idItem)).prop('checked', tarefa.check);
 			clone.find('.item-title').text(tarefa.texto);
@@ -224,11 +227,10 @@
 			
 			if (id == null){
 				myApp.addNotification({
-					title: 'Tarefa adicionada com sucesso!',
-					hold: 6000,
+					message: 'Tarefa adicionada com sucesso!',
+					hold: 3000,
 					button: {
-						text: 'Fechar',
-						color: 'red'
+						text: 'Fechar'
 					}
 				});			
 			}
@@ -252,59 +254,50 @@
 				$(this).find('.btn-ver').unbind('click').click(function () {
 					var texto = $('#' + id).siblings('.item-inner').find('.item-title').text();
 					var descricao = $('#' + id).siblings('.item-inner').find('.item-text').text();
-					myApp.alert(descricao, texto, limparCampos);
+					myApp.alert(descricao, texto);
 				});
 				
 				$(this).find('.btn-remover').unbind('click').click(function () {
 					removerItem(id);
 				});				
 			});
-			
-			$('#remove-all').unbind('click').click(function(){removerTodosItens()});
 		}
 		
 		function checkBoxesChecked(){
 			if($('input[name=my-checkbox]:checked').length > 0){
 				$('#remove-all').removeAttr('disabled');
-			} else {
+			}else{
 				$('#remove-all').attr('disabled', true);
 			}
-			
-			if ($('#item-tarefa li').length <= 2) {
-				$('#none-item').show();
-			}
 		}
 		
-		function removerItem(idItem) {
-			myApp.confirm('Tem certeza que deseja remover essa tarefa?', 'Remover Tarefa', function() {
+		function removerItem(idItem){
+			myApp.confirm('Tem certeza que deseja remover essa tarefa?', 'Remover Tarefa', function (){
 				$('#' + idItem).parents('li').remove();
+				if($('#item-tarefa li').length <= 2){
+					$('#none-item').show();
+				}
 				checkBoxesChecked();
-				var itemARemover;
-				$.each(tarefas, function() {
-					if (this.id == idItem.substr(idItem.length - 1)) {
-						itemARemover = this;
-					}
-				});
-				indice = tarefas.indexOf(itemARemover);
-				tarefas.splice(indice, 1);
-				updateLocalStorageGlobal();
-			});
+			});				
 		}
 		
-		function removerTodosItens() {
-			myApp.confirm('Tem certeza que deseja remover todas as tarefas?', 'Remover Tarefas', function() {
+		function removerTodosItens(){
+			myApp.confirm('Tem certeza que deseja remover todas as tarefas?', 'Remover Tarefas', function (){
 				var boxes = $('input[name=my-checkbox]:checked');
-				boxes.each(function() {
+				boxes.each(function(){
 					$(this).parents('li').remove();
 				});
+				if($('#item-tarefa li').length <= 2){
+					$('#none-item').show();
+				}				
 				checkBoxesChecked();
 			});				
 			
 		}
 		
-		function limparCampos() {
-			$('#new-tarefa').val('').focus();
-			$('#descricao').val('');
+		function limparCampos(){
+			$('#new-tarefa').val('');
+			$('#descricao').val('');			
 		}
 		
 	</script>	
