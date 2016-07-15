@@ -138,30 +138,6 @@
 			material: true
 		}); 
 		var mainView = myApp.addView('.view-main');	
-		
-		document.addEventListener('deviceready', onDeviceReady, false);
-		
-		var bd;
-		function onDeviceReady() {
-		alert('Device ready');
-			bd = window.openDatabase('bd_tarefas', 1, 'Base de Tarefas', 200000);
-			bd.transaction(popularBD, erroCB, sucessoCB);
-		}
-	
-		function popularBD(tx) {
-			tx.executeSql('DROP TABLE IF EXISTS TB_TAREFA');
-			tx.executeSql('CREATE TABLE TB_TAREFA(ID INTEGER PRIMARY KEY AUTOINCREMENT, MARCADO INTEGER, TEXTO TEXT, DESCRICAO TEXT)');
-			tx.executeSql('INSERT INTO TB_TAREFA(MARCADO, TEXTO, DESCRICAO) VALUES(0, "Tarefa 1", "Desc 1")');
-			tx.executeSql('INSERT INTO TB_TAREFA(MARCADO, TEXTO, DESCRICAO) VALUES(0, "Tarefa 2", "Desc 2")');
-		}
-		
-		function erroCB(err){
-			alert('Erro no BD: ' + err.message + '\nCodigo: ' + err.code);
-		}
-		
-		function sucessoCB(err){
-			alert('Sucesso');
-		}		
 	
 		var idItem = 0;
 		var tarefas = [];
